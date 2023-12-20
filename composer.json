@@ -1,0 +1,38 @@
+{
+    "name": "outeredge/magento-opentelemetry-module",
+    "description": "Magento Opentelemetry Module by outer/edge",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "MIT"
+    ],
+    "authors": [
+        {
+            "name": "outer/edge",
+            "email": "support@outeredge.agency",
+            "homepage": "https://outeredge.agency/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.1",
+        "open-telemetry/opentelemetry-logger-monolog": "^1.0.0",
+        "open-telemetry/exporter-otlp": "1.0.1"
+    },
+    "require-dev": {
+        "outeredge/dev-dependencies": "^3.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "OuterEdge\\Opentelemetry\\": ""
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}
