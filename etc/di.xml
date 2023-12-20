@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers"  xsi:type="array">
+                <item name="openTelemetry" xsi:type="object">OuterEdge\Opentelemetry\Logger\Handler\OpenTelemetry</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
