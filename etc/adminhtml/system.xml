@@ -23,6 +23,7 @@
                 </field>
                 <field id="log_type" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>OTLP Api License Key</label>
+                    <source_model>OuterEdge\Opentelemetry\Model\Config\Source\ErrorTypesList</source_model>
                 </field>
             </group>
         </section>

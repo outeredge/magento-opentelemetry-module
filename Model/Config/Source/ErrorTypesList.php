@@ -1,6 +1,6 @@
 <?php
 
-namespace OuterEdge\Opentelemetry\Model;
+namespace OuterEdge\Opentelemetry\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 
