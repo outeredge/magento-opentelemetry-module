@@ -18,8 +18,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class OpenTelemetry extends Base
 {
-    protected $typesToLog = ['EXCEPTION', 'ERROR', 'CRITICAL'];
-
     public function __construct(
         DriverInterface $filesystem,
         protected ExceptionHandler $exceptionHandler,
@@ -58,14 +56,9 @@ class OpenTelemetry extends Base
             return;
         }
 
-        $errorType = false;
-        foreach ($this->typesToLog as $type) {
-            if ($record['level_name'] == $type) {
-                $errorType = $type;
-            }
-        }
+        $typesToLog = explode(',', $this->scopeConfig->getValue('oe_open_telemetry/settings/log_types'));
 
-        if ($errorType) {
+        if (in_array($record['level_name'], $typesToLog)) {
             $storeName = $this->storeManager->getWebsite()->getCode();
             $magentoVersion = $this->productMetadata->getVersion();
             $domain = $this->storeManager->getStore()->getBaseUrl();
@@ -83,10 +76,10 @@ class OpenTelemetry extends Base
             $eventLogger = new EventLogger($logger, $domain);
 
             $recordLog = (new LogRecord([]))
-                ->setSeverityText($errorType)
-                ->setSeverityNumber(9);
+                ->setSeverityText($record['level_name'])
+                ->setSeverityNumber($record['level']);
 
-            $eventLogger->logEvent($errorType, $recordLog);
+            $eventLogger->logEvent($record['level_name'], $recordLog);
             $loggerProvider->shutdown();
         }
     }
