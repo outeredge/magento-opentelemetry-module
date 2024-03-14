@@ -1,6 +1,6 @@
 {
     "name": "outeredge/magento-opentelemetry-module",
-    "description": "Magento Opentelemetry Module by outer/edge",
+    "description": "Magento Open Telemetry Module by outer/edge",
     "type": "magento2-module",
     "version": "1.0.0",
     "license": [
@@ -17,7 +17,7 @@
     "require": {
         "php": "^7.4|^8.1",
         "open-telemetry/opentelemetry-logger-monolog": "^1.0.0",
-        "open-telemetry/exporter-otlp": "1.0.1"
+        "open-telemetry/exporter-otlp": "^1.0.4"
     },
     "require-dev": {
         "outeredge/dev-dependencies": "^3.0"
@@ -27,7 +27,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "OuterEdge\\Opentelemetry\\": ""
+            "OuterEdge\\OpenTelemetry\\": ""
         }
     },
     "config": {

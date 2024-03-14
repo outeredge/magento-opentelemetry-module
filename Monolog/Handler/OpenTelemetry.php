@@ -1,6 +1,6 @@
 <?php
 
-namespace OuterEdge\Opentelemetry\Logger\Handler;
+namespace OuterEdge\OpenTelemetry\Logger\Handler;
 
 use Magento\Framework\Filesystem\DriverInterface;
 use Magento\Framework\Logger\Handler\Exception as ExceptionHandler;
@@ -26,22 +26,23 @@ class OpenTelemetry extends Base
         protected ScopeConfigInterface $scopeConfig,
         ?string $filePath = null
     ) {
-        $this->init();
+        if ($this->isEnabled()) {
+            $endpoint = $this->scopeConfig->getValue('oe_open_telemetry/settings/endpoint');
+            $headers  = $this->scopeConfig->getValue('oe_open_telemetry/settings/headers');
+
+            putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
+            putenv('OTEL_METRICS_EXPORTER=none');
+            putenv('OTEL_LOGS_EXPORTER=otlp');
+            putenv('OTEL_LOGS_PROCESSOR=batch');
+            putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf');
+            putenv('OTEL_EXPORTER_OTLP_ENDPOINT=' . $endpoint);
+
+            if (!empty($headers)) {
+                putenv('OTEL_EXPORTER_OTLP_HEADERS=' . $headers);
+            }
+        }
+
         parent::__construct($filesystem, $filePath);
-    }
-
-    public function init()
-    {
-        $endPoint = $this->scopeConfig->getValue('oe_open_telemetry/settings/endpoint');
-        $apiKey = $this->scopeConfig->getValue('oe_open_telemetry/settings/api_key');
-
-        putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
-        putenv('OTEL_METRICS_EXPORTER=none');
-        putenv('OTEL_LOGS_EXPORTER=otlp');
-        putenv('OTEL_LOGS_PROCESSOR=batch');
-        putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf');
-        putenv('OTEL_EXPORTER_OTLP_ENDPOINT='.$endPoint);
-        putenv('OTEL_EXPORTER_OTLP_HEADERS=' .$apiKey);
     }
 
     /**
@@ -84,8 +85,8 @@ class OpenTelemetry extends Base
         }
     }
 
-    private function isEnabled() {
-        return (bool) $this->scopeConfig->isSetFlag(
-            'oe_open_telemetry/settings/enable');
+    private function isEnabled()
+    {
+        return (bool) $this->scopeConfig->isSetFlag('oe_open_telemetry/settings/enable');
     }
 }

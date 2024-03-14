@@ -1,11 +1,11 @@
 <?php
 
-namespace OuterEdge\Opentelemetry\Model\Config\Source;
+namespace OuterEdge\OpenTelemetry\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 use Monolog\Logger;
 
-class ErrorTypesList implements ArrayInterface
+class ErrorTypesList implements OptionSourceInterface
 {
     public function toOptionArray()
     {

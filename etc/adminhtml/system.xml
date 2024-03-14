@@ -5,25 +5,26 @@
         <tab id="outeredge" translate="label" sortOrder="2000" class="outeredge-tab">
             <label>outer/edge</label>
         </tab>
-        <section id="oe_open_telemetry" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="oe_open_telemetry" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
             <label>Open Telemetry</label>
             <tab>outeredge</tab>
             <resource>OuterEdge_Base::OpenTelemetry</resource>
-            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Settings</label>
-                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Enabled?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="endpoint" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>OTLP Url Endpoint</label>
+                <field id="endpoint" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>OTLP Endpoint</label>
                 </field>
-                <field id="api_key" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>OTLP Api License Key</label>
+                <field id="headers" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>OTLP Additional Headers</label>
+                    <comment>Comma-separated i.e. X-License-Key=key,other-config-value=value</comment>
                 </field>
-                <field id="log_types" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Logging levels</label>
-                    <source_model>OuterEdge\Opentelemetry\Model\Config\Source\ErrorTypesList</source_model>
+                <field id="log_types" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Error levels to log</label>
+                    <source_model>OuterEdge\OpenTelemetry\Model\Config\Source\ErrorTypesList</source_model>
                 </field>
             </group>
         </section>
