@@ -1,6 +1,6 @@
 <?php
 
-namespace OuterEdge\OpenTelemetry\Logger\Handler;
+namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
 use Magento\Framework\Filesystem\DriverInterface;
 use Magento\Framework\Logger\Handler\Exception as ExceptionHandler;
