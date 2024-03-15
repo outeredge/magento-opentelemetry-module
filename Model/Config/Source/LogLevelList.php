@@ -5,11 +5,11 @@ namespace OuterEdge\OpenTelemetry\Model\Config\Source;
 use Magento\Framework\Data\OptionSourceInterface;
 use Monolog\Logger;
 
-class ErrorTypesList implements OptionSourceInterface
+class LogLevelList implements OptionSourceInterface
 {
     public function toOptionArray()
     {
-        $return = array();
+        $return = [];
         foreach (Logger::getLevels() as $key => $value) {
             $return[] = array(
                 'value' => $key,

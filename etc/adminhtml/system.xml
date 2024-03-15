@@ -17,14 +17,15 @@
                 </field>
                 <field id="endpoint" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>OTLP Endpoint</label>
+                    <comment>https://server:port</comment>
                 </field>
                 <field id="headers" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>OTLP Additional Headers</label>
                     <comment>Comma-separated i.e. X-License-Key=key,other-config-value=value</comment>
                 </field>
-                <field id="log_types" translate="label" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
-                    <label>Error levels to log</label>
-                    <source_model>OuterEdge\OpenTelemetry\Model\Config\Source\ErrorTypesList</source_model>
+                <field id="log_level" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Log level</label>
+                    <source_model>OuterEdge\OpenTelemetry\Model\Config\Source\LogLevelList</source_model>
                 </field>
             </group>
         </section>
