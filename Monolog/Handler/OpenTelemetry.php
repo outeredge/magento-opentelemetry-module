@@ -5,7 +5,7 @@ namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\State;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
@@ -22,24 +22,30 @@ class OpenTelemetry extends Handler
 {
     const CONFIG_KEY_HEADERS  = 'oe_open_telemetry/settings/headers';
     const CONFIG_KEY_ENABLED  = 'oe_open_telemetry/settings/enable';
+    const CONFIG_KEY_SERVICE  = 'oe_open_telemetry/settings/service';
     const CONFIG_KEY_ENDPOINT = 'oe_open_telemetry/settings/endpoint';
     const CONFIG_KEY_LOGLEVEL = 'oe_open_telemetry/settings/log_level';
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         State $appState,
-        StoreManagerInterface $storeManager,
         ProductMetadataInterface $productMetadata
     ) {
         if (!$this->isEnabled()) {
             return;
         }
 
+        try {
+            $areaCode = $appState->getAreaCode();
+        } catch (LocalizedException $ex) {
+            $areaCode = 'unknown';
+        }
+
         $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create([
-            ResourceAttributes::SERVICE_NAMESPACE => $appState->getAreaCode(),
-            ResourceAttributes::SERVICE_NAME => $storeManager->getStore()->getBaseUrl(),
+            ResourceAttributes::SERVICE_NAMESPACE => $areaCode,
+            ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(self::CONFIG_KEY_SERVICE),
             ResourceAttributes::SERVICE_VERSION => $productMetadata->getVersion(),
-            ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $appState->getMode(),
+            ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $appState->getMode()
         ])));
 
         $transport = (new OtlpHttpTransportFactory())->create(
