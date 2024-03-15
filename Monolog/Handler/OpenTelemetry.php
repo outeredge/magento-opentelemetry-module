@@ -8,6 +8,7 @@ use Magento\Framework\App\State;
 use Magento\Store\Model\StoreManagerInterface;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
+use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -42,7 +43,7 @@ class OpenTelemetry extends Handler
         ])));
 
         $transport = (new OtlpHttpTransportFactory())->create(
-            $this->scopeConfig->getValue(self::CONFIG_KEY_ENDPOINT) . '/v1/logs',
+            $this->scopeConfig->getValue(self::CONFIG_KEY_ENDPOINT) . '/' . HttpEndpointResolverInterface::LOGS_DEFAULT_PATH,
             ContentTypes::PROTOBUF,
             $this->getHeaders()
         );
