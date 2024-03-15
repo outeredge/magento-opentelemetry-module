@@ -4,6 +4,9 @@
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="openTelemetry" xsi:type="object">OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry</item>
+                <item name="system" xsi:type="object">Magento\Framework\Logger\Handler\System</item>
+                <item name="debug" xsi:type="object">Magento\Framework\Logger\Handler\Debug</item>
+                <item name="syslog" xsi:type="object">Magento\Framework\Logger\Handler\Syslog</item>
             </argument>
         </arguments>
     </type>
