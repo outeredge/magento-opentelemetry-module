@@ -2,6 +2,7 @@
     <default>
         <oe_open_telemetry>
             <settings>
+                <exclusion_lists>common</exclusion_lists>
                 <log_level>ERROR</log_level>
             </settings>
         </oe_open_telemetry>
