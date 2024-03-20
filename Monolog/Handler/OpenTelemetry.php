@@ -3,20 +3,8 @@
 namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Framework\App\State;
-use Magento\Framework\Exception\LocalizedException;
+use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
-use OpenTelemetry\Contrib\Otlp\ContentTypes;
-use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
-use OpenTelemetry\Contrib\Otlp\LogsExporter;
-use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Logs\LoggerProvider;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
-use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\SemConv\ResourceAttributes;
 
 class OpenTelemetry extends Handler
 {
@@ -25,39 +13,18 @@ class OpenTelemetry extends Handler
     const CONFIG_KEY_SERVICE  = 'oe_open_telemetry/settings/service';
     const CONFIG_KEY_ENDPOINT = 'oe_open_telemetry/settings/endpoint';
     const CONFIG_KEY_LOGLEVEL = 'oe_open_telemetry/settings/log_level';
+    const CONFIG_KEY_LISTS    = 'oe_open_telemetry/settings/exclusion_lists';
+    const CONFIG_KEY_PATTERNS = 'oe_open_telemetry/settings/exclusion_patterns';
+
+    protected ?string $exclusionPattern = null;
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
-        State $appState,
-        ProductMetadataInterface $productMetadata
+        protected LazyLoggerProvider $loggerProvider
     ) {
         if (!$this->isEnabled()) {
             return;
         }
-
-        try {
-            $areaCode = $appState->getAreaCode();
-        } catch (LocalizedException $ex) {
-            $areaCode = 'unknown';
-        }
-
-        $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create([
-            ResourceAttributes::SERVICE_NAMESPACE => $areaCode,
-            ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(self::CONFIG_KEY_SERVICE),
-            ResourceAttributes::SERVICE_VERSION => $productMetadata->getVersion(),
-            ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $appState->getMode()
-        ])));
-
-        $transport = (new OtlpHttpTransportFactory())->create(
-            $this->scopeConfig->getValue(self::CONFIG_KEY_ENDPOINT) . '/' . HttpEndpointResolverInterface::LOGS_DEFAULT_PATH,
-            ContentTypes::PROTOBUF,
-            $this->getHeaders()
-        );
-
-        $loggerProvider = LoggerProvider::builder()
-            ->setResource($resource)
-            ->addLogRecordProcessor(new SimpleLogRecordProcessor(new LogsExporter($transport)))
-            ->build();
 
         parent::__construct(
             $loggerProvider,
@@ -72,23 +39,47 @@ class OpenTelemetry extends Handler
             return;
         }
 
+        // Don't send this log entry to the collector if it matches one of the patterns
+        if ($this->getPatternsAsRegex() && preg_match($this->getPatternsAsRegex(), $record['formatted']['message'])) {
+            return;
+        }
+
         parent::write($record);
     }
 
-    private function getHeaders(): array
+    protected function getPatternsAsRegex(): string|false
     {
-        $headers = [];
-        if (!empty($headerconfig = $this->scopeConfig->getValue(self::CONFIG_KEY_HEADERS))) {
-            $headerconfig = explode(',', $headerconfig);
-            foreach ($headerconfig as $header) {
-                list($k, $v) = explode('=', $header);
-                $headers[$k] = $v;
+        if (null === $this->exclusionPattern) {
+            $patterns = [];
+            foreach (explode(',', (string) $this->scopeConfig->getValue(self::CONFIG_KEY_LISTS)) as $listname) {
+                $patternList = 'OuterEdge\OpenTelemetry\ExclusionList\\' . ucfirst($listname);
+                if (class_exists($patternList)) {
+                    $patterns = array_merge($patterns, $patternList::getPatterns());
+                }
+            }
+
+            $customPatterns = trim((string) $this->scopeConfig->getValue(self::CONFIG_KEY_PATTERNS));
+            $customPatterns = array_filter(array_map(function($rule) {
+                return preg_quote(trim($rule), '/');
+            }, explode("\n", $customPatterns)));
+
+            $patterns = array_merge($patterns, $customPatterns);
+
+            $pattern = implode('|', array_map(function($rule) {
+                return preg_quote($rule, '/');
+            }, $patterns));
+
+            if (empty($pattern)) {
+                $this->exclusionPattern = false;
+            } else {
+                $this->exclusionPattern = '/' . $pattern . '/';
             }
         }
-        return $headers;
+
+        return $this->exclusionPattern;
     }
 
-    private function isEnabled()
+    protected function isEnabled()
     {
         return (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
     }
