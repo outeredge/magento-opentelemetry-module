@@ -62,7 +62,9 @@ class LazyLoggerProvider implements LoggerProviderInterface
             $transport = (new OtlpHttpTransportFactory())->create(
                 $this->scopeConfig->getValue(Handler::CONFIG_KEY_ENDPOINT) . '/' . HttpEndpointResolverInterface::LOGS_DEFAULT_PATH,
                 ContentTypes::PROTOBUF,
-                $this->getHeaders()
+                $this->getHeaders(),
+                null,
+                3.
             );
 
             $this->loggerProvider = LoggerProvider::builder()
