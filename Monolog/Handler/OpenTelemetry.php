@@ -8,13 +8,14 @@ use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 
 class OpenTelemetry extends Handler
 {
-    const CONFIG_KEY_HEADERS  = 'oe_open_telemetry/settings/headers';
-    const CONFIG_KEY_ENABLED  = 'oe_open_telemetry/settings/enable';
-    const CONFIG_KEY_SERVICE  = 'oe_open_telemetry/settings/service';
-    const CONFIG_KEY_ENDPOINT = 'oe_open_telemetry/settings/endpoint';
-    const CONFIG_KEY_LOGLEVEL = 'oe_open_telemetry/settings/log_level';
-    const CONFIG_KEY_LISTS    = 'oe_open_telemetry/settings/exclusion_lists';
-    const CONFIG_KEY_PATTERNS = 'oe_open_telemetry/settings/exclusion_patterns';
+    const CONFIG_KEY_ENABLED   = 'oe_open_telemetry/settings/enable';
+    const CONFIG_KEY_SERVICE   = 'oe_open_telemetry/settings/service';
+    const CONFIG_KEY_ENDPOINT  = 'oe_open_telemetry/settings/endpoint';
+    const CONFIG_KEY_HEADERS   = 'oe_open_telemetry/settings/headers';
+    const CONFIG_KEY_RESOURCES = 'oe_open_telemetry/settings/resources';
+    const CONFIG_KEY_LOGLEVEL  = 'oe_open_telemetry/settings/log_level';
+    const CONFIG_KEY_LISTS     = 'oe_open_telemetry/settings/exclusion_lists';
+    const CONFIG_KEY_PATTERNS  = 'oe_open_telemetry/settings/exclusion_patterns';
 
     protected ?string $exclusionPattern = null;
 

@@ -23,8 +23,12 @@
                     <label>OTLP Additional Headers</label>
                     <comment>Comma-separated i.e. X-License-Key=key,other-config-value=value</comment>
                 </field>
+                <field id="resources" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>OTLP Resource Attributes</label>
+                    <comment>Comma-separated i.e. resource.key=value,other.key=value</comment>
+                </field>
                 <field id="service" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
-                    <label>Service Name</label>
+                    <label>OTLP Service Name</label>
                     <comment>Leave empty to use the Magento base URL</comment>
                 </field>
                 <field id="log_level" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
