@@ -5,9 +5,7 @@ namespace OuterEdge\OpenTelemetry\Logs;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\State;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\UrlInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
@@ -30,7 +28,6 @@ class LazyLoggerProvider implements LoggerProviderInterface
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
-        protected StoreManagerInterface $storeManager,
         protected ProductMetadataInterface $productMetadata,
         protected UrlInterface $urlInterface
     ) {
@@ -44,23 +41,22 @@ class LazyLoggerProvider implements LoggerProviderInterface
     ): LoggerInterface
     {
         if (null === $this->loggerProvider) {
-            try {
-                $areaCode = $this->appState->getAreaCode();
-            } catch (LocalizedException $ex) {
-                $areaCode = 'unknown';
+            $extra = [];
+
+            if (php_sapi_name() != 'cli') {
+                $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
             }
 
             $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create(
                 array_merge(
                     [
-                        ResourceAttributes::SERVICE_NAMESPACE => $areaCode,
                         ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
-                        ResourceAttributes::HOST_NAME => $this->storeManager->getStore()->getBaseUrl(),
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode(),
-                        TraceAttributes::URL_FULL => $this->urlInterface->getCurrentUrl()
+                        ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
+                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode()
                     ],
-                    $this->getConfigAsArray(Handler::CONFIG_KEY_RESOURCES)
+                    $this->getConfigAsArray(Handler::CONFIG_KEY_RESOURCES),
+                    $extra
                 )
             )));
 
