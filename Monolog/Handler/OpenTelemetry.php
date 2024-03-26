@@ -21,6 +21,8 @@ class OpenTelemetry extends Handler
 
     protected ?string $exclusionPattern = null;
 
+    protected ?bool $enabled = null;
+
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected LazyLoggerProvider $loggerProvider,
@@ -85,10 +87,21 @@ class OpenTelemetry extends Handler
 
     protected function isEnabled()
     {
-        if (!(bool)$this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLEDEV) && $this->appState->getMode() == State::MODE_DEVELOPER) {
-            return false;
+        if (null !== $this->enabled) {
+            return $this->enabled;
         }
 
-        return (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
+        $enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
+
+        if ($enabled
+            && !(bool)$this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLEDEV)
+            && $this->appState->getMode() == State::MODE_DEVELOPER
+        ) {
+            $enabled = false;
+        }
+
+        $this->enabled = $enabled;
+
+        return $this->enabled;
     }
 }
