@@ -45,6 +45,10 @@
                     <comment>One rule per line </comment>
                     <tooltip>Skip sending log entries that match these Regex patterns.</tooltip>
                 </field>
+                <field id="enable_dev" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Enable in Developer Mode?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>

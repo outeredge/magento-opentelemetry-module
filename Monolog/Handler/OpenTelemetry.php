@@ -3,12 +3,14 @@
 namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
+use Magento\Framework\App\State;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
+use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 
 class OpenTelemetry extends Handler
 {
     const CONFIG_KEY_ENABLED   = 'oe_open_telemetry/settings/enable';
+    const CONFIG_KEY_ENABLEDEV = 'oe_open_telemetry/settings/enable_dev';
     const CONFIG_KEY_SERVICE   = 'oe_open_telemetry/settings/service';
     const CONFIG_KEY_ENDPOINT  = 'oe_open_telemetry/settings/endpoint';
     const CONFIG_KEY_HEADERS   = 'oe_open_telemetry/settings/headers';
@@ -21,7 +23,8 @@ class OpenTelemetry extends Handler
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
-        protected LazyLoggerProvider $loggerProvider
+        protected LazyLoggerProvider $loggerProvider,
+        protected State $appState
     ) {
         if (!$this->isEnabled()) {
             return;
@@ -82,6 +85,10 @@ class OpenTelemetry extends Handler
 
     protected function isEnabled()
     {
+        if (!(bool)$this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLEDEV) && $this->appState->getMode() == State::MODE_DEVELOPER) {
+            return false;
+        }
+
         return (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
     }
 }
