@@ -9,6 +9,8 @@ class Common implements ExclusionListInterface
         return [
             'Can not resolve reCAPTCHA parameter',
             'maintenance mode is enabled',
+            'No such file or directory',
+            'does not exists',
         ];
     }
 }
