@@ -4,6 +4,7 @@ namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
+use Monolog\Logger;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 
@@ -34,7 +35,7 @@ class OpenTelemetry extends Handler
 
         parent::__construct(
             $loggerProvider,
-            $this->scopeConfig->getValue(self::CONFIG_KEY_LOGLEVEL),
+            $this->scopeConfig->getValue(self::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR,
             true
         );
     }
