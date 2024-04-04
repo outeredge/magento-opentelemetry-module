@@ -3,7 +3,7 @@
 namespace OpenTelemetry\ProductFinder\Model\Api;
 
 use OuterEdge\ProductFinder\Api\LoggerFrontendRepositoryInterface;
-use Magento\Framework\Webapi\Rest\Request as RestRequest;
+use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
@@ -12,7 +12,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     protected ?bool $enabled = null;
 
     public function __construct(
-        protected RestRequest $request
+        protected OpenTelemetry $openTelemetry
     ) {
         if (!$this->isEnabled()) {
             return json_encode(['success' => false, 'message' => 'Frontend Log is disabled']);
