@@ -10,4 +10,7 @@
             </argument>
         </arguments>
     </type>
+
+    <!--API-->
+	<preference for="OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface" type="OuterEdge\OpenTelemetry\Model\Api\LoggerFrontendRepository"/>
 </config>
