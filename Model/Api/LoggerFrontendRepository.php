@@ -1,8 +1,8 @@
 <?php
 
-namespace OpenTelemetry\ProductFinder\Model\Api;
+namespace OpenTelemetry\OpenTelemetry\Model\Api;
 
-use OuterEdge\ProductFinder\Api\LoggerFrontendRepositoryInterface;
+use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
