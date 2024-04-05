@@ -1,9 +1,10 @@
 <?php
 
-namespace OpenTelemetry\OpenTelemetry\Model\Api;
+namespace OuterEdge\OpenTelemetry\Model\Api;
 
 use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
@@ -12,6 +13,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     protected ?bool $enabled = null;
 
     public function __construct(
+        protected ScopeConfigInterface $scopeConfig,
         protected OpenTelemetry $openTelemetry
     ) {
         if (!$this->isEnabled()) {
@@ -49,5 +51,4 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 
         return $this->enabled;
     }
-
 }

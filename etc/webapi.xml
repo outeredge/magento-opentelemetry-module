@@ -5,7 +5,6 @@
         <service class="OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface" method="setLog" />
         <resources>
             <!--ToDo remove ref=anonymous to require authentication-->
-            <!--<resource ref="OuterEdge_OpenTelemetry::api_finders_get_results" />-->
             <resource ref="anonymous" />
         </resources>
     </route>
