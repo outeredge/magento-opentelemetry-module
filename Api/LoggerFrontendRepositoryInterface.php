@@ -5,9 +5,8 @@ namespace OuterEdge\OpenTelemetry\Api;
 interface LoggerFrontendRepositoryInterface
 {
     /**
-     * @param mixed $data
+     * @param mixed $message
      * @return array
      */
-    public function setLog($data);
+    public function setLog($message);
 }
-

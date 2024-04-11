@@ -3,8 +3,9 @@
 namespace OuterEdge\OpenTelemetry\Model\Api;
 
 use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
-use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Serialize\SerializerInterface;
+use \Psr\Log\LoggerInterface;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
@@ -14,7 +15,8 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
-        protected OpenTelemetry $openTelemetry
+        protected SerializerInterface $serializer,
+        protected LoggerInterface $logger
     ) {
         if (!$this->isEnabled()) {
             return json_encode(['success' => false, 'message' => 'Frontend Log is disabled']);
@@ -24,21 +26,22 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function setLog($data)
+    public function setLog($message)
     {
-        if (!isset($data['answers']) || !isset($data['details'])) {
-            return json_encode(['success' => false, 'message' => 'Missing data']);
-        }
+        if (!isset($message)) {
+            return json_encode(['success' => false, 'message' => 'Missing message']);
+         }
 
         try {
-            //Send Data to Monolog
+            $message = $this->serializer->serialize($message);
+            $this->logger->error($message);
 
 
         } catch (\Exception $e) {
             return json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        return json_encode(['success' => true, 'message' => ["url" => 'XXX']]);
+        return json_encode(['success' => true, 'message' => ["url" => 'Log saved']]);
     }
 
     protected function isEnabled()
