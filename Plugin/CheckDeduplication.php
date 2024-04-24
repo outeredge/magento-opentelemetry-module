@@ -7,24 +7,13 @@ use Monolog\Handler\DeduplicationHandler;
 
 class CheckDeduplication
 {
-     /**
-     * @var LeadsHelper
-     */
-    protected $leadsHelper;
-
-    /**
-     * @param LeadsHelper $leadsHelper
-     */
-    public function __construct(
-        protected DeduplicationHandler $deduplicationHandler
-    ) {
-    }
-
-    public function afterPushHandler(Logger $subject, $handler)
+    public function afterPushHandler(Logger $subject, $result, $handler)
 	{
         if ($handler instanceof \OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry) {
-           $test = new \Monolog\Handler\DeduplicationHandler($handler, null, Logger::ERROR, 60, true);
-           $test->flush();
+            $openTelemetry = new \Monolog\Handler\DeduplicationHandler($handler, null, Logger::ERROR, 60, true);
+            $openTelemetry->flush();
         }
+
+        return $subject;
     }
 }

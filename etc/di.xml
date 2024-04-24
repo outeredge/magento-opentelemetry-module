@@ -11,9 +11,7 @@
         </arguments>
     </type>
 
-    <preference for="Monolog\Logger" type="OuterEdge\OpenTelemetry\Plugin\CheckDeduplication" />
-
-    <!-- <type name="Monolog\Logger">
+    <type name="Monolog\Logger">
         <plugin name="OuterEdge_OpenTelemetry::checkDeduplication" type="OuterEdge\OpenTelemetry\Plugin\CheckDeduplication" sortOrder="1" />
-    </type>-->
+    </type>
 </config>
