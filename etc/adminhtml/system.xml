@@ -49,6 +49,10 @@
                     <label>Enable in Developer Mode?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="enabled_deduplication" translate="label" type="textarea" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Enabled Deduplication handler</label>
+                    <can_be_empty>1</can_be_empty>
+                </field>
             </group>
         </section>
     </system>
