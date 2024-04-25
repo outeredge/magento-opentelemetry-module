@@ -42,12 +42,17 @@
                 </field>
                 <field id="exclusion_patterns" translate="label" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Custom Exclusion Patterns</label>
-                    <comment>One rule per line </comment>
+                    <comment>One rule per line</comment>
                     <tooltip>Skip sending log entries that match these Regex patterns.</tooltip>
                 </field>
                 <field id="enable_dev" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Enable in Developer Mode?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_deduplication" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Deduplication Seconds</label>
+                    <comment>Number of seconds in which duplicate entries are suppressed</comment>
+                    <tooltip>Set to 0 to disable this function.</tooltip>
                 </field>
             </group>
         </section>
