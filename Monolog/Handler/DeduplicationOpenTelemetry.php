@@ -8,8 +8,6 @@ use Monolog\Logger;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 use Monolog\Handler\DeduplicationHandler;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
-use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Framework\UrlInterface;
 
 class DeduplicationOpenTelemetry extends DeduplicationHandler
 {
@@ -18,19 +16,15 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
-        protected ProductMetadataInterface $productMetadata,
-        protected UrlInterface $urlInterface
+        protected LazyLoggerProvider $loggerProvider
     ) {
 
-        $loggerProvider = new LazyLoggerProvider($this->scopeConfig, $this->appState, $this->productMetadata, $this->urlInterface);
-        $openTelemetry = new OpenTelemetry($this->scopeConfig, $loggerProvider, $this->appState);
-
         parent::__construct(
-            $openTelemetry,
+            new OpenTelemetry($this->scopeConfig, $this->loggerProvider, $this->appState),
             null,
-            Logger::ERROR,
-            $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLED_DEDUPLICATION),
-            true);
-
+            Logger::toMonologLevel($this->scopeConfig->getValue(OpenTelemetry::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR),
+            $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLED_DEDUPLICATION) ?? 0,
+            true
+        );
     }
 }
