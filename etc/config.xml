@@ -6,7 +6,7 @@
                 <service>magento</service>
                 <exclusion_lists>common</exclusion_lists>
                 <log_level>ERROR</log_level>
-                <enabled_deduplication>60</enabled_deduplication>
+                <enable_deduplication>60</enable_deduplication>
             </settings>
         </oe_open_telemetry>
     </default>

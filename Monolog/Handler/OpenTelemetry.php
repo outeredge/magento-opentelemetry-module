@@ -5,6 +5,7 @@ namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 
@@ -40,12 +41,17 @@ class OpenTelemetry extends Handler
         );
     }
 
-    protected function write($record): void
+    public function handle(LogRecord $record): bool
     {
         if (!$this->isEnabled()) {
-            return;
+            return false;
         }
 
+        return parent::handle($record);
+    }
+
+    protected function write($record): void
+    {
         // Don't send this log entry to the collector if it matches one of the patterns
         if ($this->getPatternsAsRegex() && preg_match($this->getPatternsAsRegex(), $record['formatted']['message'])) {
             return;
@@ -86,7 +92,7 @@ class OpenTelemetry extends Handler
         return $this->exclusionPattern;
     }
 
-    protected function isEnabled()
+    public function isEnabled(): bool
     {
         if (null !== $this->enabled) {
             return $this->enabled;
