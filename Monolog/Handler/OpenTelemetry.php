@@ -5,7 +5,6 @@ namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
 use Monolog\Logger;
-use Monolog\LogRecord;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
 
@@ -41,7 +40,7 @@ class OpenTelemetry extends Handler
         );
     }
 
-    public function handle(LogRecord $record): bool
+    public function handle(array $record): bool
     {
         if (!$this->isEnabled()) {
             return false;

@@ -4,7 +4,6 @@ namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Monolog\Logger;
-use Monolog\LogRecord;
 use Monolog\Handler\DeduplicationHandler;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
 
@@ -24,7 +23,7 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
         );
     }
 
-    public function handle(LogRecord $record): bool
+    public function handle(array $record): bool
     {
         if (!$this->handler->isEnabled()) {
             return false;
