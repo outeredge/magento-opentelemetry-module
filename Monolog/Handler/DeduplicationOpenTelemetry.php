@@ -13,10 +13,10 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
-        protected OpenTelemetry $handler
+        protected OpenTelemetry $basehandler
     ) {
         parent::__construct(
-            $this->handler,
+            $this->basehandler,
             null,
             $this->scopeConfig->getValue(OpenTelemetry::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR,
             $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLE_DEDUPLICATION) ?? 60
@@ -25,7 +25,7 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
 
     public function handle(array $record): bool
     {
-        if (!$this->handler->isEnabled()) {
+        if (!$this->basehandler->isEnabled()) {
             return false;
         }
 
