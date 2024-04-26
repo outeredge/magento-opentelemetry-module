@@ -29,6 +29,6 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
             return false;
         }
 
-        return parent::write($record);
+        return parent::handle($record);
     }
 }
