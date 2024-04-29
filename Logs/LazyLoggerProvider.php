@@ -45,6 +45,9 @@ class LazyLoggerProvider implements LoggerProviderInterface
 
             if (php_sapi_name() != 'cli') {
                 $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
+                if (!empty($_SERVER['HTTP_REFERER'])) {
+                    $extra['url.referrer'] = $_SERVER['HTTP_REFERER'];
+                }
             }
 
             $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create(
