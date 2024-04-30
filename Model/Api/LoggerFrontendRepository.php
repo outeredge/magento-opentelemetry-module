@@ -4,7 +4,6 @@ namespace OuterEdge\OpenTelemetry\Model\Api;
 
 use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Serialize\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Webapi\Rest\Request;
 use Magento\Store\Model\StoreManagerInterface;
@@ -18,7 +17,6 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
-        protected SerializerInterface $serializer,
         protected LoggerInterface $logger,
         protected Request $request,
         protected StoreManagerInterface $storeManager
@@ -45,10 +43,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
         }
 
         try {
-            $message = $this->serializer->serialize($message);
             $this->logger->error($message);
-
-
         } catch (\Exception $e) {
             return json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
