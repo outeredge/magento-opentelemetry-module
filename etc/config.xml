@@ -3,7 +3,7 @@
         <oe_open_telemetry>
             <settings>
                 <enable_dev>0</enable_dev>
-                <service>backend</service>
+                <service>magento</service>
                 <exclusion_lists>common</exclusion_lists>
                 <log_level>ERROR</log_level>
                 <enable_deduplication>60</enable_deduplication>
