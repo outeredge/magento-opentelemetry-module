@@ -50,11 +50,17 @@ if ($frontEndLoggerStatus->isEnabled()):
                 message = `Could not load file: ${event.target.href}.css`;
                 break;
             case "SCRIPT":
-                message = `Could not load script: ${event.target.src}`;
-                break;
-            case "IMG":
-                message = `Could not load image: ${event.target.src}`;
-                break;
+                var src = event.target.src;
+                var extensionRegex = /\.([0-9a-z]+)(?=[?&]|$)/i;
+                var match = src.match(extensionRegex);
+                var extension = match ? match[1].toLowerCase() : '';
+
+                if (extension && /^(jpg|jpeg|png|webp)$/.test(extension)) {
+                    // If the script src ends with an image extension, don't send any message
+                } else {
+                    // If it's not an image extension, then send the error message
+                    message = `Could not load script: ${src}`;
+                }
             default:
                 return; // Ignore errors for other element types
         }
@@ -64,11 +70,13 @@ if ($frontEndLoggerStatus->isEnabled()):
             message: message,
             url: event.target.baseURI
         };
+        if (!message) return;
         addErrorToQueue(eventError);
     }
 
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
+        console.log(event.error)
         const { message, filename, lineno, colno, error } = event;
         const eventError = {
             type: event.type,
