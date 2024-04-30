@@ -1,38 +1,34 @@
-<?php
-
-$frontEndLoggerStatus = $block->getData('frontendLogger');
-if ($frontEndLoggerStatus->isEnabled()):
-
-?>
+<?php if ($block->getData('frontendLogger')->isEnabled()) : ?>
 <script data-head="true">
     async function handleAPI(error) {
-            const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
+        const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(error),
-            });
-
-            const result = await response.json();
-
+        });
+        const result = await response.json();
     }
+    
     const handleFilesError = (event) => {
         if (event.target.tagName != "LINK") { return; }
         const eventError = {
             type: event.type,
-            message: `Could not load file: ${event.target.href}.css`,
-            url: event.target.baseURI
+            message: `Could not load file: ${event.target.href}`,
+            url: window.BASE_URL
         }
         handleAPI(eventError);
     }
+    
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
 
         const { message, filename, lineno, colno, error } = event;
         const eventError = {
             type: event.type,
-            message: `${lineno}:${colno} ${filename}`
+            message: `${lineno}:${colno} ${filename}`,
+            url: window.BASE_URL
         }
         handleAPI(eventError);
     }, {
