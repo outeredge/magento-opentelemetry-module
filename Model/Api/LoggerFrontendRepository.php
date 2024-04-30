@@ -11,7 +11,6 @@ use Magento\Store\Model\StoreManagerInterface;
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
     const CONFIG_KEY_ENABLE_FRONTEND = 'oe_open_telemetry/settings/enable_frontend';
-    const CONFIG_KEY_ENABLE_CORS     = 'oe_open_telemetry/settings/enable_cors';
 
     protected ?bool $enabled = null;
 
@@ -31,12 +30,10 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
      */
     public function log($message)
     {
-        if ($this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLE_CORS)) {
-            $url = parse_url($this->storeManager->getStore()->getBaseUrl());
-            if ($this->request->getHeader('x-forwarded-host') != $url['host']) {
-                return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
-            }
-        }
+        $url = parse_url($this->storeManager->getStore()->getBaseUrl());
+        if ($this->request->getHeader('x-forwarded-host') != $url['host']) {
+            return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
+        }        
 
         if (!isset($message)) {
             return json_encode(['success' => false, 'message' => 'Missing message']);

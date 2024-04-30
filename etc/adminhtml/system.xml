@@ -53,10 +53,6 @@
                     <label>Log frontend errors?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="enable_cors" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
-                    <label>Enable CORS Request on frontend</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
                 <field id="enable_deduplication" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Deduplication Seconds</label>
                     <comment>Number of seconds in which duplicate entries are suppressed</comment>
