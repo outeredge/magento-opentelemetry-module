@@ -1,7 +1,7 @@
 <?php if ($block->getData('frontendLogger')->isEnabled()) : ?>
 <script data-head="true">
     async function handleAPI(error) {
-        const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
+        const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/log`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

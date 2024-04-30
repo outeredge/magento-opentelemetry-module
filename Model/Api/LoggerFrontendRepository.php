@@ -29,7 +29,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function setLog($message)
+    public function log($message)
     {
         if ($this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLE_CORS)) {
             $url = parse_url($this->storeManager->getStore()->getBaseUrl());

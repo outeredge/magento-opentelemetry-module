@@ -8,5 +8,5 @@ interface LoggerFrontendRepositoryInterface
      * @param mixed $message
      * @return array
      */
-    public function setLog($message);
+    public function log($message);
 }
