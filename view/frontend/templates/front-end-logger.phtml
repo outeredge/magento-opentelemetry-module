@@ -1,40 +1,96 @@
-<?php if ($block->getData('frontendLogger')->isEnabled()) : ?>
+<?php
+$frontEndLoggerStatus = $block->getData('frontendLogger');
+if ($frontEndLoggerStatus->isEnabled()):
+?>
 <script data-head="true">
-    async function handleAPI(error) {
-        const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/log`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(error),
-        });
-        const result = await response.json();
+    let errorQueue = [];
+    let sendingErrors = false;
+
+    async function sendErrorsToAPI(force = false) {
+        // If already sending errors, just under 10 errors logged and nothing in the queue, return
+        if (!force && errorQueue.length < 10) {
+            return;
+        }
+
+        if (sendingErrors) return;
+        sendingErrors = true;
+
+        try {
+            const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(errorQueue),
+            });
+            if (response.ok) {
+                errorQueue = []; // Clear the error queue if the API call is successful
+            } else {
+                console.error("Failed to send errors to API:", response.status);
+            }
+        } catch (error) {
+            sendingErrors = false;
+            console.error("Failed to send errors to API:", error);
+        } finally {
+            sendingErrors = false;
+        }
     }
-    
-    const handleFilesError = (event) => {
-        if (event.target.tagName != "LINK") { return; }
+
+    function addErrorToQueue(error) {
+        errorQueue.push(error);
+        if (!sendingErrors) {
+            sendErrorsToAPI();
+        }
+    }
+
+    function handleFilesError(event) {
+        let message;
+        switch (event.target.tagName) {
+            case "LINK":
+                message = `Could not load file: ${event.target.href}.css`;
+                break;
+            case "SCRIPT":
+                message = `Could not load script: ${event.target.src}`;
+                break;
+            case "IMG":
+                message = `Could not load image: ${event.target.src}`;
+                break;
+            default:
+                return; // Ignore errors for other element types
+        }
+
         const eventError = {
             type: event.type,
-            message: `Could not load file: ${event.target.href}`,
-            url: window.BASE_URL
-        }
-        handleAPI(eventError);
+            message: message,
+            url: event.target.baseURI
+        };
+        addErrorToQueue(eventError);
     }
-    
+
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
-
         const { message, filename, lineno, colno, error } = event;
         const eventError = {
             type: event.type,
             message: `${lineno}:${colno} ${filename}`,
-            url: window.BASE_URL
-        }
-        handleAPI(eventError);
+            errorMessage: error.message,
+            stackTrace: error.stack
+        };
+        addErrorToQueue(eventError);
     }, {
         capture: true,
         once: false,
         passive: true
+    });
+
+    // Just in case after 20 seconds force send the pending errors
+    setTimeout(() => {
+        sendErrorsToAPI(true);
+    }, 20000);
+
+    // Force send pending errors before leaving the page
+    window.addEventListener('beforeunload', () => {
+        sendErrorsToAPI(true);
     });
 </script>
 <?php endif; ?>
