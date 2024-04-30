@@ -1,0 +1,44 @@
+<?php
+
+$frontEndLoggerStatus = $block->getData('frontendLogger');
+if ($frontEndLoggerStatus->isEnabled()):
+
+?>
+<script data-head="true">
+    async function handleAPI(error) {
+            const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(error),
+            });
+
+            const result = await response.json();
+
+    }
+    const handleFilesError = (event) => {
+        if (event.target.tagName != "LINK") { return; }
+        const eventError = {
+            type: event.type,
+            message: `Could not load file: ${event.target.href}.css`,
+            url: event.target.baseURI
+        }
+        handleAPI(eventError);
+    }
+    window.addEventListener('error', (event) => {
+        if (!event.error) return handleFilesError(event);
+
+        const { message, filename, lineno, colno, error } = event;
+        const eventError = {
+            type: event.type,
+            message: `${lineno}:${colno} ${filename}`
+        }
+        handleAPI(eventError);
+    }, {
+        capture: true,
+        once: false,
+        passive: true
+    });
+</script>
+<?php endif; ?>

@@ -8,6 +8,7 @@
                 <log_level>ERROR</log_level>
                 <enable_deduplication>60</enable_deduplication>
                 <enable_cors>1</enable_cors>
+                <enable_frontend>1</enable_frontend>
             </settings>
         </oe_open_telemetry>
     </default>

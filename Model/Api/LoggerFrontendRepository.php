@@ -11,8 +11,8 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
-    const CONFIG_KEY_ENABLE_FRONTEND   = 'oe_open_telemetry/settings/enable_frontend';
-    const CONFIG_KEY_ENABLE_CORS   = 'oe_open_telemetry/settings/enable_cors';
+    const CONFIG_KEY_ENABLE_FRONTEND = 'oe_open_telemetry/settings/enable_frontend';
+    const CONFIG_KEY_ENABLE_CORS     = 'oe_open_telemetry/settings/enable_cors';
 
     protected ?bool $enabled = null;
 
