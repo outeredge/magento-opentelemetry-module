@@ -31,11 +31,14 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
      */
     public function log($errors)
     {
-        $url = parse_url($this->storeManager->getStore()->getBaseUrl());
-        if ($this->request->getHeader('x-forwarded-host') != $url['host']) {
+        $parseUrl = parse_url($this->storeManager->getStore()->getBaseUrl());
+        $domain = $parseUrl['host'];
+        $url = $parseUrl['scheme']."://".$parseUrl['host'];
+
+        if ($this->request->getHeader('x-forwarded-host') != $domain ||
+            $this->request->getHeader('Origin') != $url) {
             return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
         }
-        //ToDO CORS check
 
         foreach ($errors as $error) {
 
