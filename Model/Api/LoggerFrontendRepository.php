@@ -7,6 +7,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Webapi\Rest\Request;
 use Magento\Store\Model\StoreManagerInterface;
+use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
@@ -28,24 +29,29 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function log($message)
+    public function log($errors)
     {
         $url = parse_url($this->storeManager->getStore()->getBaseUrl());
         if ($this->request->getHeader('x-forwarded-host') != $url['host']) {
             return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
-        }        
-
-        if (!isset($message)) {
-            return json_encode(['success' => false, 'message' => 'Missing message']);
         }
+        //ToDO CORS check
 
-        try {
-            $this->logger->error($message);
-        } catch (\Exception $e) {
-            return json_encode(['success' => false, 'message' => $e->getMessage()]);
+        foreach ($errors as $error) {
+
+            if (!isset($error['message'])) {
+                return json_encode(['success' => false, 'message' => 'Missing message']);
+            }
+
+            try {
+                $error['service'] = OpenTelemetry::AREA_FRONTEND;
+                $this->logger->error($error['message'], $error);
+            } catch (\Exception $e) {
+                return json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+
+            return json_encode(['success' => true, 'message' => ["url" => 'Log saved']]);
         }
-
-        return json_encode(['success' => true, 'message' => ["url" => 'Log saved']]);
     }
 
     protected function isEnabled()

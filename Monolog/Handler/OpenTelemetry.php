@@ -19,6 +19,8 @@ class OpenTelemetry extends Handler
     const CONFIG_KEY_LOGLEVEL  = 'oe_open_telemetry/settings/log_level';
     const CONFIG_KEY_LISTS     = 'oe_open_telemetry/settings/exclusion_lists';
     const CONFIG_KEY_PATTERNS  = 'oe_open_telemetry/settings/exclusion_patterns';
+    const AREA_FRONTEND        = 'frontend';
+    const AREA_BACKEND         = 'backend';
 
     protected ?string $exclusionPattern = null;
 
@@ -44,6 +46,14 @@ class OpenTelemetry extends Handler
     {
         if (!$this->isEnabled()) {
             return false;
+        }
+
+        if (isset($record['context']['url'])) {
+            $this->loggerProvider->setUrl($record['context']['url']);
+        }
+
+        if (isset($record['context']['service'])) {
+            $this->loggerProvider->setService($record['context']['service']);
         }
 
         return parent::handle($record);

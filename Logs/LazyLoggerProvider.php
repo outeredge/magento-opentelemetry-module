@@ -25,6 +25,10 @@ class LazyLoggerProvider implements LoggerProviderInterface
 {
     protected ?LoggerProviderInterface $loggerProvider = null;
 
+    protected $url;
+
+    protected $service;
+
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
@@ -44,13 +48,13 @@ class LazyLoggerProvider implements LoggerProviderInterface
             $extra = [];
 
             if (php_sapi_name() != 'cli') {
-                $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
+                $extra[TraceAttributes::URL_FULL] = $this->url ?? $this->urlInterface->getCurrentUrl();
             }
 
             $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create(
                 array_merge(
                     [
-                        ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
+                        ResourceAttributes::SERVICE_NAME => $this->service ?? Handler::AREA_BACKEND,
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
                         ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
                         ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode()
@@ -87,5 +91,13 @@ class LazyLoggerProvider implements LoggerProviderInterface
             }
         }
         return $values;
+    }
+
+    public function setUrl($url) {
+        $this->url = $url;
+    }
+
+    public function setService($service) {
+        $this->service = $service;
     }
 }
