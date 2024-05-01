@@ -35,8 +35,10 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
         $domain = $parseUrl['host'];
         $url = $parseUrl['scheme']."://".$parseUrl['host'];
 
-        if ($this->request->getHeader('x-forwarded-host') != $domain ||
-            $this->request->getHeader('Origin') != $url) {
+        if (!$this->request->isXmlHttpRequest() ||
+            $this->request->getHeader('x-forwarded-host') != $domain ||
+            $this->request->getHeader('origin') != $url ||
+            $this->request->getHeader('sec-fetch-site') != 'same-origin') {
             return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
         }
 
