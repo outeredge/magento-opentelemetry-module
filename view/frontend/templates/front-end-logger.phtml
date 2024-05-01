@@ -37,8 +37,19 @@ if ($frontEndLoggerStatus->isEnabled()):
     }
 
     function addErrorToQueue(error) {
-        errorQueue.push(error);
-        if (!sendingErrors) {
+        // Check if the error is already present in the errorQueue
+        const isErrorAlreadyPresent = errorQueue.some(existingError => {
+            return (
+                existingError.message === error.message
+            );
+        });
+
+        // Push the error to the queue only if it's not already present
+        if (!isErrorAlreadyPresent) {
+            errorQueue.push(error);
+        }
+
+        if (!sendingErrors && !isErrorAlreadyPresent) {
             sendErrorsToAPI();
         }
     }
