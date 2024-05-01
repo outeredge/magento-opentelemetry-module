@@ -50,7 +50,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
                 return json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
 
-            return json_encode(['success' => true, 'message' => ["url" => 'Log saved']]);
+            return json_encode(['success' => true, 'message' => ['Log saved']]);
         }
     }
 
