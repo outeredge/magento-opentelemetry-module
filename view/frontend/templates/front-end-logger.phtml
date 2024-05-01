@@ -87,7 +87,6 @@ if ($frontEndLoggerStatus->isEnabled()):
 
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
-        console.log(event.error)
         const { message, filename, lineno, colno, error } = event;
         const eventError = {
             type: event.type,
