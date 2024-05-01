@@ -16,12 +16,12 @@ if ($frontEndLoggerStatus->isEnabled()):
         sendingErrors = true;
 
         try {
-            const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/setLog`, {
+            const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/log`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(errorQueue),
+                body: JSON.stringify({errors: errorQueue}),
             });
             if (response.ok) {
                 errorQueue = []; // Clear the error queue if the API call is successful
@@ -79,8 +79,9 @@ if ($frontEndLoggerStatus->isEnabled()):
         const eventError = {
             type: event.type,
             message: message,
-            url: event.target.baseURI
+            url: window.location.href
         };
+
         if (!message) return;
         addErrorToQueue(eventError);
     }
@@ -88,11 +89,12 @@ if ($frontEndLoggerStatus->isEnabled()):
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
         const { message, filename, lineno, colno, error } = event;
+        const setMessage = error.stack ? error.stack : `${lineno}:${colno} ${filename}`;
+
         const eventError = {
             type: event.type,
-            message: `${lineno}:${colno} ${filename}`,
-            errorMessage: error.message,
-            stackTrace: error.stack
+            message: setMessage,
+            url: window.location.href,
         };
         addErrorToQueue(eventError);
     }, {
