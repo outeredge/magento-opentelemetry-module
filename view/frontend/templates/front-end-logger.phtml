@@ -58,7 +58,7 @@
                 break;
             case 'SCRIPT':
                 var src       = event.target.src;
-                var extension = split('.').pop().toLowerCase();
+                var extension = src.split('.').pop().toLowerCase();
                 var skipexts  = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
 
                 if (skipexts.includes(extension)) {
