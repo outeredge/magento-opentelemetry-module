@@ -2,12 +2,12 @@
 
 namespace OuterEdge\OpenTelemetry\Model\Api;
 
-use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Psr\Log\LoggerInterface;
+use Magento\Framework\Phrase;
 use Magento\Framework\Webapi\Rest\Request;
-use Magento\Store\Model\StoreManagerInterface;
-use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry;
+use Magento\Framework\Webapi\Exception;
+use OuterEdge\OpenTelemetry\Api\LoggerFrontendRepositoryInterface;
+use Psr\Log\LoggerInterface;
 
 class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
 {
@@ -18,12 +18,8 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected LoggerInterface $logger,
-        protected Request $request,
-        protected StoreManagerInterface $storeManager
+        protected Request $request
     ) {
-        if (!$this->isEnabled()) {
-            return [['success' => false, 'message' => 'Frontend Log is disabled']];
-        }
     }
 
     /**
@@ -31,41 +27,33 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
      */
     public function log($errors)
     {
-        $parseUrl = parse_url($this->storeManager->getStore()->getBaseUrl());
-        $domain = $parseUrl['host'];
-        $url = $parseUrl['scheme']."://".$parseUrl['host'];
+        if (!$this->isEnabled()) {
+            throw new Exception(new Phrase('Frontend logging is disabled'));
+        }
 
-        if (!$this->request->isXmlHttpRequest() ||
-            $this->request->getHeader('x-forwarded-host') != $domain ||
-            $this->request->getHeader('origin') != $url ||
-            $this->request->getHeader('sec-fetch-site') != 'same-origin') {
-            return [['success' => false, 'message' => 'Blocked by CORS policy']];
+        if (!$this->request->isXmlHttpRequest()) {
+            throw new Exception(new Phrase('Forbidden'));
         }
 
         foreach ($errors as $error) {
-
-            if (!isset($error['message'])) {
-                return [['success' => false, 'message' => 'Missing message']];
+            foreach (['message', 'type'] as $key) {
+                if (empty($error[$key])) {
+                    throw new Exception(new Phrase("Missing or empty `$key` value"));
+                }
             }
 
-            try {
-                $error['service'] = OpenTelemetry::AREA_FRONTEND;
-                $this->logger->error($error['message'], $error);
-            } catch (\Exception $e) {
-                return [['success' => false, 'message' => $e->getMessage()]];
-            }
-
-            return [['success' => true, 'message' => 'Log saved']];
+            // For now, we send everything as an "error" type
+            $this->logger->error($error['message']);
         }
+
+        return [['success' => true]];
     }
 
-    protected function isEnabled()
+    protected function isEnabled(): bool
     {
-        if (null !== $this->enabled) {
-            return $this->enabled;
+        if (null === $this->enabled) {
+            $this->enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLE_FRONTEND);
         }
-
-        $this->enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLE_FRONTEND);
 
         return $this->enabled;
     }

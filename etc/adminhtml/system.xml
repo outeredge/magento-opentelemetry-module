@@ -57,7 +57,7 @@
                     <label>Deduplication Seconds</label>
                     <comment>Number of seconds in which duplicate entries are suppressed</comment>
                     <tooltip>Set to 0 to disable this function.</tooltip>
-                </field>                
+                </field>
             </group>
         </section>
     </system>

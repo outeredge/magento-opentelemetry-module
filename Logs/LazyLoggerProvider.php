@@ -5,6 +5,7 @@ namespace OuterEdge\OpenTelemetry\Logs;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\UrlInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
@@ -26,10 +27,6 @@ class LazyLoggerProvider implements LoggerProviderInterface
 {
     protected ?LoggerProviderInterface $loggerProvider = null;
 
-    protected $url;
-
-    protected $service;
-
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
@@ -49,14 +46,28 @@ class LazyLoggerProvider implements LoggerProviderInterface
         if (null === $this->loggerProvider) {
             $extra = [];
 
-            if (php_sapi_name() != 'cli') {
-                $extra[TraceAttributes::URL_FULL] = $this->url ?? $this->urlInterface->getCurrentUrl();
+            if (str_contains($this->urlInterface->getCurrentUrl(), 'open_telemetry/log')) {
+                $extra[ResourceAttributes::SERVICE_NAMESPACE] = 'javascript';
+                $extra[TraceAttributes::URL_FULL]             = $_SERVER['HTTP_REFERER'];
+            } else {
+                try {
+                    $extra[ResourceAttributes::SERVICE_NAMESPACE] = $this->appState->getAreaCode();
+                } catch (LocalizedException) {
+                    // do nothing if area code is not set
+                }
+
+                if (php_sapi_name() != 'cli') {
+                    $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
+                    if (!empty($_SERVER['HTTP_REFERER'])) {
+                        $extra['url.referrer'] = $_SERVER['HTTP_REFERER'];
+                    }
+                }
             }
 
             $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create(
                 array_merge(
                     [
-                        ResourceAttributes::SERVICE_NAME => $this->service ?? Handler::AREA_BACKEND,
+                        ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
                         ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
                         ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode(),
@@ -94,13 +105,5 @@ class LazyLoggerProvider implements LoggerProviderInterface
             }
         }
         return $values;
-    }
-
-    public function setUrl($url) {
-        $this->url = $url;
-    }
-
-    public function setService($service) {
-        $this->service = $service;
     }
 }

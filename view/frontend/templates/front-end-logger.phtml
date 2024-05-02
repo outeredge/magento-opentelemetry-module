@@ -1,37 +1,32 @@
-<?php
-$frontEndLoggerStatus = $block->getData('frontendLogger');
-if ($frontEndLoggerStatus->isEnabled()):
-?>
+<?php if ($block->getData('frontendLogger')->isEnabled()): ?>
 <script data-head="true">
     let errorQueue = [];
     let sendingErrors = false;
 
     async function sendErrorsToAPI(force = false) {
-        // If already sending errors, just under 10 errors logged and nothing in the queue, return
-        if (!force && errorQueue.length < 10) {
+        if (sendingErrors || errorQueue.length == 0 || (!force && errorQueue.length < 10)) {
             return;
         }
 
-        if (sendingErrors) return;
         sendingErrors = true;
 
         try {
             const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/log`, {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({errors: errorQueue}),
             });
             if (response.ok) {
-                errorQueue = []; // Clear the error queue if the API call is successful
+                errorQueue = [];
             } else {
-                console.error("Failed to send errors to API:", response.status);
+                console.error('Failed to send errors to API: ', response.message);
             }
         } catch (error) {
             sendingErrors = false;
-            console.error("Failed to send errors to API:", error);
+            console.error('Failed to send errors to API: ', error);
         } finally {
             sendingErrors = false;
         }
@@ -58,17 +53,17 @@ if ($frontEndLoggerStatus->isEnabled()):
     function handleFilesError(event) {
         let message;
         switch (event.target.tagName) {
-            case "LINK":
-                message = `Could not load file: ${event.target.href}.css`;
+            case 'LINK':
+                message = `Could not load file: ${event.target.href}`;
                 break;
-            case "SCRIPT":
-                var src = event.target.src;
-                var extensionRegex = /\.([0-9a-z]+)(?=[?&]|$)/i;
-                var match = src.match(extensionRegex);
-                var extension = match ? match[1].toLowerCase() : '';
+            case 'SCRIPT':
+                var src       = event.target.src;
+                var extension = split('.').pop().toLowerCase();
+                var skipexts  = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
 
-                if (extension && /^(jpg|jpeg|png|webp)$/.test(extension)) {
+                if (skipexts.includes(extension)) {
                     // If the script src ends with an image extension, don't send any message
+                    return;
                 } else {
                     // If it's not an image extension, then send the error message
                     message = `Could not load script: ${src}`;
@@ -79,24 +74,23 @@ if ($frontEndLoggerStatus->isEnabled()):
 
         const eventError = {
             type: event.type,
-            message: message,
-            url: window.location.href
+            message: message
         };
 
-        if (!message) return;
         addErrorToQueue(eventError);
     }
 
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
+
         const { message, filename, lineno, colno, error } = event;
         const setMessage = error.stack ? error.stack : `${lineno}:${colno} ${filename}`;
 
         const eventError = {
             type: event.type,
-            message: setMessage,
-            url: window.location.href,
+            message: setMessage
         };
+
         addErrorToQueue(eventError);
     }, {
         capture: true,
