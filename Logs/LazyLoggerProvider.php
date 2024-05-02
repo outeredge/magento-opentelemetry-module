@@ -5,6 +5,7 @@ namespace OuterEdge\OpenTelemetry\Logs;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\UrlInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
@@ -19,6 +20,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Magento\Framework\Session\SessionManager;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry as Handler;
 
 class LazyLoggerProvider implements LoggerProviderInterface
@@ -29,7 +31,8 @@ class LazyLoggerProvider implements LoggerProviderInterface
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
         protected ProductMetadataInterface $productMetadata,
-        protected UrlInterface $urlInterface
+        protected UrlInterface $urlInterface,
+        protected SessionManager $session
     ) {
     }
 
@@ -43,10 +46,21 @@ class LazyLoggerProvider implements LoggerProviderInterface
         if (null === $this->loggerProvider) {
             $extra = [];
 
-            if (php_sapi_name() != 'cli') {
-                $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
-                if (!empty($_SERVER['HTTP_REFERER'])) {
-                    $extra['url.referrer'] = $_SERVER['HTTP_REFERER'];
+            if (str_contains($this->urlInterface->getCurrentUrl(), 'open_telemetry/log')) {
+                $extra[ResourceAttributes::SERVICE_NAMESPACE] = 'javascript';
+                $extra[TraceAttributes::URL_FULL]             = $_SERVER['HTTP_REFERER'];
+            } else {
+                try {
+                    $extra[ResourceAttributes::SERVICE_NAMESPACE] = $this->appState->getAreaCode();
+                } catch (LocalizedException) {
+                    // do nothing if area code is not set
+                }
+
+                if (php_sapi_name() != 'cli') {
+                    $extra[TraceAttributes::URL_FULL] = $this->urlInterface->getCurrentUrl();
+                    if (!empty($_SERVER['HTTP_REFERER'])) {
+                        $extra['url.referrer'] = $_SERVER['HTTP_REFERER'];
+                    }
                 }
             }
 
@@ -56,7 +70,8 @@ class LazyLoggerProvider implements LoggerProviderInterface
                         ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
                         ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode()
+                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode(),
+                        TraceAttributes::SESSION_ID => $this->session->getSessionId()
                     ],
                     $this->getConfigAsArray(Handler::CONFIG_KEY_RESOURCES),
                     $extra
