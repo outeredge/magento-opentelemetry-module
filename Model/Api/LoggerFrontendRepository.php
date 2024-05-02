@@ -22,7 +22,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
         protected StoreManagerInterface $storeManager
     ) {
         if (!$this->isEnabled()) {
-            return json_encode(['success' => false, 'message' => 'Frontend Log is disabled']);
+            return ['success' => false, 'message' => 'Frontend Log is disabled'];
         }
     }
 
@@ -39,23 +39,23 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
             $this->request->getHeader('x-forwarded-host') != $domain ||
             $this->request->getHeader('origin') != $url ||
             $this->request->getHeader('sec-fetch-site') != 'same-origin') {
-            return json_encode(['success' => false, 'message' => 'Blocked by CORS policy']);
+            return ['success' => false, 'message' => 'Blocked by CORS policy'];
         }
 
         foreach ($errors as $error) {
 
             if (!isset($error['message'])) {
-                return json_encode(['success' => false, 'message' => 'Missing message']);
+                return ['success' => false, 'message' => 'Missing message'];
             }
 
             try {
                 $error['service'] = OpenTelemetry::AREA_FRONTEND;
                 $this->logger->error($error['message'], $error);
             } catch (\Exception $e) {
-                return json_encode(['success' => false, 'message' => $e->getMessage()]);
+                return ['success' => false, 'message' => $e->getMessage()];
             }
 
-            return json_encode(['success' => true, 'message' => ['Log saved']]);
+            return ['success' => true, 'message' => 'Log saved'];
         }
     }
 
