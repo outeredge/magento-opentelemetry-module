@@ -11,6 +11,8 @@ class Common implements ExclusionListInterface
             'maintenance mode is enabled',
             'No such file or directory',
             'does not exists',
+            'Front controller reached 100 router match iterations',
+            'Environment emulation nesting is not allowed'
         ];
     }
 }
