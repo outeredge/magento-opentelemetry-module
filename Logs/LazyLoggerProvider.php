@@ -20,7 +20,6 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\SemConv\TraceAttributes;
-use Magento\Framework\Session\SessionManager;
 use OuterEdge\OpenTelemetry\Monolog\Handler\OpenTelemetry as Handler;
 
 class LazyLoggerProvider implements LoggerProviderInterface
@@ -31,8 +30,7 @@ class LazyLoggerProvider implements LoggerProviderInterface
         protected ScopeConfigInterface $scopeConfig,
         protected State $appState,
         protected ProductMetadataInterface $productMetadata,
-        protected UrlInterface $urlInterface,
-        protected SessionManager $session
+        protected UrlInterface $urlInterface
     ) {
     }
 
@@ -61,6 +59,10 @@ class LazyLoggerProvider implements LoggerProviderInterface
                     if (!empty($_SERVER['HTTP_REFERER'])) {
                         $extra['url.referrer'] = $_SERVER['HTTP_REFERER'];
                     }
+                    $sessionId = session_id();
+                    if (!empty($sessionId)) {
+                        $extra[TraceAttributes::SESSION_ID] = $sessionId;
+                    }
                 }
             }
 
@@ -70,8 +72,7 @@ class LazyLoggerProvider implements LoggerProviderInterface
                         ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
                         ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode(),
-                        TraceAttributes::SESSION_ID => $this->session->getSessionId()
+                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode()
                     ],
                     $this->getConfigAsArray(Handler::CONFIG_KEY_RESOURCES),
                     $extra
