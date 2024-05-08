@@ -51,7 +51,7 @@ class LazyLoggerProvider implements LoggerProviderInterface
                 try {
                     $extra[ResourceAttributes::SERVICE_NAMESPACE] = $this->appState->getAreaCode();
                 } catch (LocalizedException) {
-                    // do nothing if area code is not set
+                    $extra[ResourceAttributes::SERVICE_NAMESPACE] = 'unknown';
                 }
 
                 if (php_sapi_name() != 'cli') {
