@@ -10,7 +10,7 @@ class EnableList implements OptionSourceInterface
     {
         return [
             [
-                'value' => 'enable',
+                'value' => 'all',
                 'label' => __('Enable')
             ],
             [
