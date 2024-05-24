@@ -1,4 +1,4 @@
-<?php if ($block->getData('frontendLogger')->isEnabled() == 'enable'): ?>
+<?php if ($block->getData('frontendLogger')->isEnabled() == 'checkout' || $block->getData('frontendLogger')->isEnabled() == 'enable'): ?>
 <script data-head="true">
     let errorQueue = [];
     let sendingErrors = false;

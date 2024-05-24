@@ -51,7 +51,7 @@
                 </field>
                 <field id="enable_frontend" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Log frontend errors?</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <source_model>OuterEdge\OpenTelemetry\Model\Config\Source\EnableList</source_model>
                 </field>
                 <field id="enable_deduplication" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
                     <label>Deduplication Seconds</label>
