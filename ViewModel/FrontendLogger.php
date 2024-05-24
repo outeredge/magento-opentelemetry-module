@@ -15,6 +15,6 @@ class FrontendLogger implements ArgumentInterface
 
     public function isEnabled(): string
     {
-        return  $this->scopeConfig->getValue(LoggerFrontendRepository::CONFIG_KEY_ENABLE_FRONTEND);
+        return $this->scopeConfig->getValue(LoggerFrontendRepository::CONFIG_KEY_ENABLE_FRONTEND);
     }
 }
