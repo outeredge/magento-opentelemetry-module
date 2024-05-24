@@ -52,7 +52,7 @@ class LoggerFrontendRepository implements LoggerFrontendRepositoryInterface
     protected function isEnabled(): bool
     {
         if (null === $this->enabled) {
-            $this->enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLE_FRONTEND);
+            $this->enabled = $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLE_FRONTEND);
         }
 
         return $this->enabled;

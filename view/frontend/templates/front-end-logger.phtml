@@ -1,4 +1,8 @@
-<?php if ($block->getData('frontendLogger')->isEnabled()): ?>
+<?php
+$displayArea = $block->getData('displayArea');
+$isEnabled = $block->getData('frontendLogger')->isEnabled();
+?>
+<?php if ($isEnabled == 'all' || ($isEnabled == 'checkout' && $displayArea == 'checkout')): ?>
 <script data-head="true">
     let errorQueue = [];
     let sendingErrors = false;

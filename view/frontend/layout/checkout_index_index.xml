@@ -5,7 +5,7 @@
             <block name="frontend-logger" template="OuterEdge_OpenTelemetry::front-end-logger.phtml">
                 <arguments>
                     <argument name="frontendLogger" xsi:type="object">OuterEdge\OpenTelemetry\ViewModel\FrontendLogger</argument>
-                    <argument name="displayArea" xsi:type="string">all</argument>
+                    <argument name="displayArea" xsi:type="string">checkout</argument>
                 </arguments>
             </block>
         </referenceBlock>
