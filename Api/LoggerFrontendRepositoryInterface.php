@@ -6,7 +6,7 @@ interface LoggerFrontendRepositoryInterface
 {
     /**
      * @param mixed $errors
-     * @return array
+     * @return mixed[]
      */
     public function log($errors);
 }
