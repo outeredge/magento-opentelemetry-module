@@ -8,7 +8,7 @@
         <section id="oe_open_telemetry" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
             <label>Open Telemetry</label>
             <tab>outeredge</tab>
-            <resource>OuterEdge_Base::OpenTelemetry</resource>
+            <resource>OuterEdge_OpenTelemetry::config</resource>
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Settings</label>
                 <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
