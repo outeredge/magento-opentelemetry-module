@@ -12,7 +12,8 @@ class Common implements ExclusionListInterface
             'No such file or directory',
             'does not exists',
             'Front controller reached 100 router match iterations',
-            'Environment emulation nesting is not allowed'
+            'Environment emulation nesting is not allowed',
+            'No such entity with cartId = '
         ];
     }
 }
