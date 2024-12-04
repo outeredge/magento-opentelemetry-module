@@ -13,7 +13,11 @@ class Common implements ExclusionListInterface
             'does not exists',
             'Front controller reached 100 router match iterations',
             'Environment emulation nesting is not allowed',
-            'No such entity with cartId = '
+            'No such entity with cartId = ',
+            'Unable to resolve the source file',
+            'Your card has insufficient funds',
+            'Unsupported image format',
+            'Order doesn\'t have a paypal_order_id'
         ];
     }
 }
