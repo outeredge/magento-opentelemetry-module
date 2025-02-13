@@ -72,7 +72,7 @@ class LazyLoggerProvider implements LoggerProviderInterface
                         ResourceAttributes::SERVICE_NAME => $this->scopeConfig->getValue(Handler::CONFIG_KEY_SERVICE),
                         ResourceAttributes::SERVICE_VERSION => $this->productMetadata->getVersion(),
                         ResourceAttributes::HOST_NAME => $this->urlInterface->getBaseUrl(),
-                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT => $this->appState->getMode()
+                        ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => $this->appState->getMode()
                     ],
                     $this->getConfigAsArray(Handler::CONFIG_KEY_RESOURCES),
                     $extra
