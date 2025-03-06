@@ -17,7 +17,9 @@ class Common implements ExclusionListInterface
             'Unable to resolve the source file',
             'Your card has insufficient funds',
             'Unsupported image format',
-            'Order doesn\'t have a paypal_order_id'
+            'Order doesn\'t have a paypal_order_id',
+            'Compilation from source: LESS file is empty',
+            'Requested path \'_cache/merged/'
         ];
     }
 }
