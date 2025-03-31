@@ -52,7 +52,7 @@ class OpenTelemetry extends Handler
     protected function write($record): void
     {
         // Don't send this log entry to the collector if it matches one of the patterns
-        if ($this->getPatternsAsRegex() && preg_match($this->getPatternsAsRegex(), $record['formatted']['message'])) {
+        if ($this->getPatternsAsRegex() && preg_match($this->getPatternsAsRegex(), preg_quote(trim($record['formatted']['message']), '/'))) {
             return;
         }
 
