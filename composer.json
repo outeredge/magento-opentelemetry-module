@@ -14,12 +14,13 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "open-telemetry/opentelemetry-logger-monolog": "^1.0.0",
-        "open-telemetry/exporter-otlp": "^1.0.4"
+        "php": "^8.3",
+        "monolog/monolog": "^3",
+        "open-telemetry/opentelemetry-logger-monolog": "^1.1",
+        "open-telemetry/exporter-otlp": "^1.2"
     },
     "require-dev": {
-        "outeredge/dev-dependencies": "^3.0"
+        "outeredge/dev-dependencies": "^4.0"
     },
     "autoload": {
         "files": [
