@@ -7,6 +7,7 @@ use Magento\Framework\App\State;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
+use Monolog\LogRecord;
 
 class OpenTelemetry extends Handler
 {
@@ -40,7 +41,7 @@ class OpenTelemetry extends Handler
         );
     }
 
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if (!$this->isEnabled()) {
             return false;
