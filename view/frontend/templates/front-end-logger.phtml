@@ -1,19 +1,16 @@
 <?php
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 $displayArea = $block->getData('displayArea');
 $isEnabled = $block->getData('frontendLogger')->isEnabled();
-?>
-<?php if ($isEnabled == 'all' || ($isEnabled == 'checkout' && $displayArea == 'checkout')): ?>
-<script data-head="true">
+
+$script = <<<'JS'
     let errorQueue = [];
     let sendingErrors = false;
-
     async function sendErrorsToAPI(force = false) {
         if (sendingErrors || errorQueue.length == 0 || (!force && errorQueue.length < 10)) {
             return;
         }
-
         sendingErrors = true;
-
         try {
             const response = await fetch(`${window.BASE_URL}rest/V1/open_telemetry/log`, {
                 method: 'POST',
@@ -35,7 +32,6 @@ $isEnabled = $block->getData('frontendLogger')->isEnabled();
             sendingErrors = false;
         }
     }
-
     function addErrorToQueue(error) {
         // Check if the error is already present in the errorQueue
         const isErrorAlreadyPresent = errorQueue.some(existingError => {
@@ -43,17 +39,14 @@ $isEnabled = $block->getData('frontendLogger')->isEnabled();
                 existingError.message === error.message
             );
         });
-
         // Push the error to the queue only if it's not already present
         if (!isErrorAlreadyPresent) {
             errorQueue.push(error);
         }
-
         if (!sendingErrors && !isErrorAlreadyPresent) {
             sendErrorsToAPI();
         }
     }
-
     function handleFilesError(event) {
         let message;
         switch (event.target.tagName) {
@@ -64,7 +57,6 @@ $isEnabled = $block->getData('frontendLogger')->isEnabled();
                 var src       = event.target.src;
                 var extension = src.split('.').pop().toLowerCase();
                 var skipexts  = ['jpg', 'jpeg', 'png', 'svg', 'webp'];
-
                 if (skipexts.includes(extension)) {
                     // If the script src ends with an image extension, don't send any message
                     return;
@@ -75,41 +67,37 @@ $isEnabled = $block->getData('frontendLogger')->isEnabled();
             default:
                 return; // Ignore errors for other element types
         }
-
         const eventError = {
             type: event.type,
             message: message
         };
-
         addErrorToQueue(eventError);
     }
-
     window.addEventListener('error', (event) => {
         if (!event.error) return handleFilesError(event);
-
         const { message, filename, lineno, colno, error } = event;
         const setMessage = error.stack ? error.stack : `${lineno}:${colno} ${filename}`;
-
         const eventError = {
             type: event.type,
             message: setMessage
         };
-
         addErrorToQueue(eventError);
     }, {
         capture: true,
         once: false,
         passive: true
     });
-
     // Just in case after 20 seconds force send the pending errors
     setTimeout(() => {
         sendErrorsToAPI(true);
     }, 20000);
-
     // Force send pending errors before leaving the page
     window.addEventListener('beforeunload', () => {
         sendErrorsToAPI(true);
     });
-</script>
-<?php endif; ?>
+JS;
+
+if ($isEnabled == 'all' || ($isEnabled == 'checkout' && $displayArea == 'checkout')) {
+    echo $secureRenderer->renderTag('script', ['data-head' => 'true'], $script, false);
+}
+?>
