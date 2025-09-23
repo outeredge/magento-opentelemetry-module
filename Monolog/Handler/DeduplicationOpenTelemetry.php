@@ -2,6 +2,7 @@
 
 namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
+use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Monolog\Logger;
 use Monolog\Handler\DeduplicationHandler;
@@ -15,12 +16,15 @@ class DeduplicationOpenTelemetry extends DeduplicationHandler
         protected ScopeConfigInterface $scopeConfig,
         protected OpenTelemetry $basehandler
     ) {
-        parent::__construct(
-            $this->basehandler,
-            null,
-            $this->scopeConfig->getValue(OpenTelemetry::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR,
-            $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLE_DEDUPLICATION) ?? 60
-        );
+        try {
+            $logLevel = $this->scopeConfig->getValue(OpenTelemetry::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR;
+            $logTime  = $this->scopeConfig->getValue(self::CONFIG_KEY_ENABLE_DEDUPLICATION) ?? 60;
+        } catch (Exception $ex) {
+            $logLevel = Logger::ERROR;
+            $logTime  = 60;
+        }
+
+        parent::__construct($this->basehandler, null, $logLevel, $logTime);
     }
 
     public function handle(array $record): bool
