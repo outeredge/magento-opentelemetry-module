@@ -2,12 +2,12 @@
 
 namespace OuterEdge\OpenTelemetry\Monolog\Handler;
 
+use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
-use Monolog\LogRecord;
 
 class OpenTelemetry extends Handler
 {
@@ -30,15 +30,13 @@ class OpenTelemetry extends Handler
         protected LazyLoggerProvider $loggerProvider,
         protected State $appState
     ) {
-        if (!$this->isEnabled()) {
-            return;
+        try {
+            $logLevel = $this->scopeConfig->getValue(OpenTelemetry::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR;
+        } catch (Exception $ex) {
+            $logLevel = Logger::ERROR;
         }
 
-        parent::__construct(
-            $loggerProvider,
-            $this->scopeConfig->getValue(self::CONFIG_KEY_LOGLEVEL) ?? Logger::ERROR,
-            true
-        );
+        parent::__construct($loggerProvider, $logLevel, true);
     }
 
     public function handle(LogRecord $record): bool
@@ -52,6 +50,10 @@ class OpenTelemetry extends Handler
 
     protected function write($record): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+        
         // Don't send this log entry to the collector if it matches one of the patterns
         if ($this->getPatternsAsRegex() && preg_match($this->getPatternsAsRegex(), preg_quote(trim($record['formatted']['message']), '/'))) {
             return;
@@ -98,16 +100,20 @@ class OpenTelemetry extends Handler
             return $this->enabled;
         }
 
-        $enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
+        try {
+            $enabled = (bool) $this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLED);
 
-        if ($enabled
-            && !(bool)$this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLEDEV)
-            && $this->appState->getMode() == State::MODE_DEVELOPER
-        ) {
-            $enabled = false;
+            if ($enabled
+                && !(bool)$this->scopeConfig->isSetFlag(self::CONFIG_KEY_ENABLEDEV)
+                && $this->appState->getMode() == State::MODE_DEVELOPER
+            ) {
+                $enabled = false;
+            }
+
+            $this->enabled = $enabled;
+        } catch (Exception $ex) {
+            return false;
         }
-
-        $this->enabled = $enabled;
 
         return $this->enabled;
     }
