@@ -8,6 +8,7 @@ use Magento\Framework\App\State;
 use Monolog\Logger;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OuterEdge\OpenTelemetry\Logs\LazyLoggerProvider;
+use Monolog\LogRecord;
 
 class OpenTelemetry extends Handler
 {
